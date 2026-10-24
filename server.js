@@ -20,15 +20,21 @@ const {
   requireRole,
 } = require('./middleware/auth');
 
-getSecret(); // fail fast if JWT_SECRET is missing or weak
+getSecret(); 
 
 const BCRYPT_COST = 12;
-// Compared against when the username does not exist, so a wrong username and a
-// wrong password take about the same time (limits timing-based enumeration).
+const rateLimit = require('express-rate-limit');
 const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', BCRYPT_COST);
 const USERNAME_RE = /^[A-Za-z0-9_.-]{3,32}$/;
 const GENERIC_LOGIN_ERROR = 'Invalid username or password';
-
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    message: { error: 'Too many failed login attempts. Try again in 15 minutes.' },
+});
 const app = express();
 app.disable('x-powered-by');
 app.use(helmet());
@@ -44,7 +50,6 @@ function validateRegistration(body) {
   if (!USERNAME_RE.test(username)) {
     return 'Username must be 3-32 characters: letters, numbers, dot, underscore or hyphen';
   }
-  // bcrypt only uses the first 72 bytes, so reject longer passwords.
   if (password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) {
     return 'Password must be 8-72 characters';
   }
@@ -89,7 +94,7 @@ app.post('/api/register', async (req, res, next) => {
   }
 });
 
-app.post('/api/login', async (req, res, next) => {
+app.post('/api/login', loginLimiter, async (req, res, next) => {
   try {
     const { username, password } = req.body || {};
     if (
