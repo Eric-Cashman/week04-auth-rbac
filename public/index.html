@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auth &amp; RBAC Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+    h1 { margin-bottom: 0.25rem; }
+    .sub { color: #555; margin-top: 0; }
+    section { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    h2 { margin-top: 0; font-size: 1.1rem; }
+    label { display: block; margin: 0.5rem 0 0.25rem; font-weight: 600; }
+    input[type="text"], input[type="password"] { width: 100%; padding: 0.5rem; box-sizing: border-box; }
+    .row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    button { padding: 0.5rem 0.9rem; cursor: pointer; }
+    .check { font-weight: 400; margin-top: 0.75rem; }
+    #session { font-weight: 700; }
+    pre { background: #111; color: #e8edf5; padding: 1rem; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; min-height: 6rem; }
+  </style>
+</head>
+<body>
+  <h1>Auth &amp; RBAC Demo</h1>
+  <p class="sub">Node, Express, SQLite, bcrypt and JWT. This page is the public landing page.</p>
+
+  <section>
+    <h2>Session</h2>
+    <p id="session">Checking session…</p>
+  </section>
+
+  <section>
+    <h2>Register / Log in</h2>
+    <label for="username">Username</label>
+    <input id="username" type="text" autocomplete="username">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <label class="check"><input id="skipChecks" type="checkbox"> Skip client-side checks (to test server validation)</label>
+    <div class="row">
+      <button id="registerBtn" type="button">Register</button>
+      <button id="loginBtn" type="button">Log in</button>
+      <button id="logoutBtn" type="button">Log out</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Test access levels</h2>
+    <p class="sub">All three buttons are always visible on purpose. The server decides what each user may see.</p>
+    <div class="row">
+      <button id="publicBtn" type="button">Public: GET /api/public</button>
+      <button id="profileBtn" type="button">User: GET /api/profile</button>
+      <button id="adminBtn" type="button">Admin: GET /api/admin/users</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Last response</h2>
+    <pre id="output">Nothing yet.</pre>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
